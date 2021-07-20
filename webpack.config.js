@@ -15,6 +15,31 @@ module.exports = {
         enforce: "pre",
         use: ["source-map-loader"],
       },
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          "file-loader",
+          {
+            loader: "image-webpack-loader",
+            options: {
+              gifsicle: {
+                interlanced: false,
+              },
+              optipng: {
+                optimizationLevel: 7,
+              },
+              pngquant: {
+                quality: "65-90",
+                speed: 4,
+              },
+              mozjpeg: {
+                progressive: true,
+                quality: 65,
+              },
+            },
+          },
+        ],
+      },
     ],
   },
   output: {
