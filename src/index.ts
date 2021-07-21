@@ -1,11 +1,5 @@
 import * as PIXI from "pixi.js";
-
-enum Direction {
-  up = "ArrowUp",
-  down = "ArrowDown",
-  left = "ArrowLeft",
-  right = "ArrowRight",
-}
+import { Sprite } from "pixi.js";
 
 const Aplication = PIXI.Application;
 const app = new Aplication({
@@ -17,9 +11,6 @@ app.renderer.backgroundColor = 0xaa3;
 app.renderer.resize(window.innerWidth, window.innerHeight);
 document.body.appendChild(app.view);
 app.renderer.view.style.position = "absolute";
-
-const Graphics = PIXI.Graphics;
-
 class Hero {
   img: string;
   score: number = 0;
@@ -39,6 +30,8 @@ const planeSprite = new PIXI.Sprite(planeImg);
 const plane = new Hero("./images/plane.png", planeSprite.x, planeSprite.y);
 const myText = new PIXI.Text(`SCORE: ${plane.score}`);
 const keys: any = {};
+const bombs: Array<Sprite> = [];
+const tanks: any[] = [];
 
 class Enemy {
   isDead = false;
@@ -74,6 +67,9 @@ function keysDown(e: KeyboardEvent): any {
 
 function keysUp(e: any) {
   keys[e.key] = false;
+  if (e.key === " ") {
+    fireBombs();
+  }
 }
 
 app.ticker.add(gameLoop);
@@ -84,24 +80,24 @@ const bgSprite = new PIXI.TilingSprite(
   app.screen.width,
   app.screen.height
 );
-bgSprite.tileScale.set(2.5, 4.4);
+bgSprite.tileScale.set(
+  (app.renderer.width * 0.13) / 100,
+  (app.renderer.height * 0.45) / 100
+);
+console.log(app.renderer.width, app.renderer.height);
 app.ticker.add(function () {
   bgSprite.tilePosition.x -= 1;
 });
 
-const firstEnemy = PIXI.Sprite.from("./images/enemy.png");
-firstEnemy.width = app.renderer.width / 10;
-firstEnemy.height = (app.renderer.height * 11) / 100;
-
-firstEnemy.x = app.renderer.width;
-firstEnemy.y = (app.renderer.height * 80.5) / 100;
-
 app.stage.addChild(bgSprite);
 app.stage.addChild(myText);
 app.stage.addChild(planeSprite);
-app.stage.addChild(firstEnemy);
 
 function gameLoop() {
+  myText.text = `SCORE: ${plane.score}`;
+  plane.posX = planeSprite.x;
+  plane.posY = planeSprite.y;
+
   if (keys["ArrowUp"]) {
     planeSprite.y -= 10;
   }
@@ -114,14 +110,81 @@ function gameLoop() {
   if (keys["ArrowRight"]) {
     planeSprite.x += 10;
   }
+
+  updateBombs();
+  updateTanks();
+  collisionDetection(tanks, bombs);
 }
 
-app.ticker.add((delta) => loop(delta));
+setInterval(makeEnemy, 2000);
+function makeEnemy() {
+  const tank = PIXI.Sprite.from("./images/enemy.png");
+  tank.width = app.renderer.width / 10;
+  tank.height = (app.renderer.height * 11) / 100;
 
-function loop(delta: any) {
-  //console.log(firstEnemy.y);
-  firstEnemy.x -= 1;
-  if (firstEnemy.x < 0) {
-   // firstEnemy.destroy(true);
+  tank.x = app.renderer.width;
+  tank.y = (app.renderer.height * 80.5) / 100;
+  app.stage.addChild(tank);
+  tanks.push(tank);
+}
+
+function updateTanks() {
+  const tankSpeed = 5;
+  for (let i = 0; i < tanks.length; i++) {
+    tanks[i].position.x -= tankSpeed;
+    if (tanks[i].position.x < 0) {
+      app.stage.removeChild(tanks[i]);
+      tanks.splice(i, 1);
+    }
+  }
+}
+
+function collisionDetection(arr1: Array<Sprite>, arr2: Array<Sprite>) {
+  if (arr1.length > 0 && arr2.length > 0) {
+    for (let i = 0; i < arr1.length; i++) {
+      const a = arr1[i];
+      for (let y = 0; y < arr2.length; y++) {
+        const b = arr2[y];
+
+        const aBox = a.getBounds();
+        const bBox = b.getBounds();
+        if (
+          aBox.x + aBox.width > bBox.x &&
+          aBox.x < bBox.x + bBox.width &&
+          aBox.y + aBox.height > bBox.y &&
+          aBox.y < bBox.y + bBox.height
+        ) {
+          plane.score += 1;
+          app.stage.removeChild(a);
+          arr1.splice(i, 1);
+        }
+      }
+    }
+  }
+}
+
+function fireBombs() {
+  const bomb = createBomb();
+  bombs.push(bomb);
+}
+
+function createBomb() {
+  const bomb = PIXI.Sprite.from("./images/bomb1.png");
+  bomb.x = planeSprite.x;
+  bomb.y = planeSprite.y + 30;
+  bomb.width = (app.renderer.height * 6) / 100;
+  bomb.height = (app.renderer.height * 5) / 100;
+  app.stage.addChild(bomb);
+  return bomb;
+}
+
+function updateBombs() {
+  const bombSpeed = 10;
+  for (let i = 0; i < bombs.length; i++) {
+    bombs[i].position.y += bombSpeed;
+    if (bombs[i].position.y > (app.renderer.height * 87) / 100) {
+      app.stage.removeChild(bombs[i]);
+      bombs.splice(i, 1);
+    }
   }
 }
