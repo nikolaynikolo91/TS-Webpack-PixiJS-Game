@@ -5,19 +5,16 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
-    "@pixi/graphics-extras": "^6.0.4",
-    "file-loader": "^6.2.0",
-    "image-webpack-loader": "^7.0.1",
     "pixi.js": "^6.0.4",
-    "source-map-loader": "^1.0.0",
-    "ts-loader": "^9.2.3",
-    "typescript": "^4.3.5",
-    "webpack": "^5.45.1",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2"
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
-    "serve": "webpack serve",
+    "start": "nodemon",
+    "serve": "webpack-dev-server",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
