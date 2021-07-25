@@ -1,8 +1,9 @@
 import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
-import { Enemy } from "./enemy.class";
-import { Hero } from "./hero.class";
-import { StageManager } from "./stageManager.class";
+import { IHero } from "./interfaces/hero.interface";
+import { Enemy } from "./models/enemy.model";
+import { Hero } from "./models/hero.model";
+import { StageManager } from "./stage.manager";
 
 const stageManager = new StageManager(
   new PIXI.Container(),
@@ -13,7 +14,7 @@ stageManager.introOn();
 
 const mainGameTicker = new PIXI.Ticker();
 const keys: any = {};
-const plane = new Hero(
+const plane: IHero = new Hero(
   new PIXI.Sprite(PIXI.Texture.from("./images/plane.png"))
 );
 const mainScreenScore = new PIXI.Text(`SCORE: ${plane.getScore()}`);

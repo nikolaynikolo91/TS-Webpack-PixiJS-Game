@@ -1,5 +1,5 @@
 import { Sprite } from "pixi.js";
-import { IHero } from "./interfaces/hero.interface";
+import { IHero } from "../interfaces/hero.interface";
 
 export class Hero implements IHero{
   private speed = 5;
