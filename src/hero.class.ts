@@ -1,10 +1,12 @@
 import { Sprite } from "pixi.js";
+import { IHero } from "./interfaces/hero.interface";
 
-export class Hero {
-  private speed = 10;
+export class Hero implements IHero{
+  private speed = 5;
   private bombSpeed = 10;
   private bombs: Array<Sprite> = [];
   private score: number = 0;
+ 
   constructor(private sprite: Sprite) {}
 
   getScore() {
@@ -16,7 +18,7 @@ export class Hero {
   }
 
   hitEnemy() {
-    this.score += 1;
+    this.score += 100;
   }
   getBombs() {
     return this.bombs;
