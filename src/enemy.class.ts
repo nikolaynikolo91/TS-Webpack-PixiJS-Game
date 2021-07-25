@@ -1,6 +1,7 @@
 import { Sprite } from "pixi.js";
+import { IEnemy } from "./interfaces/enemy.interface";
 
-export class Enemy {
+export class Enemy implements IEnemy {
   private speed: number = 5;
   constructor(private sprite: Sprite) {}
   getSprite() {
