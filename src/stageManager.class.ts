@@ -1,6 +1,7 @@
 import { Container } from "pixi.js";
+import { IStage } from "./interfaces/stage.interface";
 
-export class StageManager {
+export class StageManager implements IStage{
   constructor(
     public intro: Container,
     public main: Container,
