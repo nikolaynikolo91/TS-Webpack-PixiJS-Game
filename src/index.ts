@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
+import { Enemy } from "./enemy.class";
 import { Hero } from "./hero.class";
 import { StageManager } from "./stageManager.class";
 
@@ -15,16 +16,12 @@ const keys: any = {};
 const plane = new Hero(
   new PIXI.Sprite(PIXI.Texture.from("./images/plane.png"))
 );
-
 const mainScreenScore = new PIXI.Text(`SCORE: ${plane.getScore()}`);
 const endBg = PIXI.Sprite.from("./images/endGameBg.png");
 const endgameSprite = PIXI.Sprite.from("./images/gameOver.png");
-
-const bulletSpeed = 15;
-const tankSpeed = 5;
-
-const tanks: any[] = [];
-const tanksBullets: Array<Sprite> = [];
+const projectileSpeed = 15;
+const projectiles: Array<Sprite> = [];
+const tanks: Enemy[] = [];
 
 const Aplication = PIXI.Application;
 const app = new Aplication({
@@ -47,7 +44,6 @@ const introBackground = PIXI.Sprite.from("./images/introBG.jpg");
 introBackground.width = app.screen.width;
 introBackground.height = app.screen.height;
 stageManager.intro.addChild(introBackground);
-
 const textureButton = PIXI.Texture.from("./images/playbtn.png");
 const playButton = new PIXI.Sprite(textureButton);
 playButton.anchor.set(0.5);
@@ -58,12 +54,11 @@ playButton.width = app.view.height * 0.7;
 playButton.interactive = true;
 playButton.buttonMode = true;
 stageManager.intro.addChild(playButton);
-
 playButton.on("pointerdown", mainStage);
-
 const textInfo = new PIXI.Text(
   `Move: Arrows \nFire: Space\nPlease click Play for start the game`
 );
+
 stageManager.intro.addChild(textInfo);
 
 function mainStage() {
@@ -83,12 +78,15 @@ function endGame(score: number = 0) {
   const endScoreText = new PIXI.Text(`Your Score is: ${plane.getScore()}`);
   endBg.width = app.view.width;
   endBg.height = app.view.height;
+
   stageManager.end.addChild(endBg);
+
   endgameSprite.anchor.set(0.5);
   endgameSprite.x = app.view.width * 0.5;
   endgameSprite.y = app.view.height * 0.25;
   endgameSprite.width = app.view.width * 0.5;
   endgameSprite.width = app.view.height * 0.8;
+
   stageManager.end.addChild(endgameSprite);
 
   endScoreText.anchor.set(0.5);
@@ -144,23 +142,23 @@ function gameLoop() {
   updateBombs();
   updateTanks();
   collisionTanks(tanks, plane.getBombs());
-  updateBullets();
+  updateProjectiles();
   collisionPlane();
 }
 
-function makeEnemyBullets() {
-  const bullet = PIXI.Sprite.from("./images/enemyFire.png");
-  bullet.width = app.renderer.width * 0.03;
-  bullet.height = app.renderer.height * 0.05;
-  bullet.x = app.renderer.width;
-  bullet.y = plane.getSprite().y;
-  stageManager.main.addChild(bullet);
-  tanksBullets.push(bullet);
+function makeEnemyProjectile() {
+  const projectile = PIXI.Sprite.from("./images/enemyFire.png");
+  projectile.width = app.renderer.width * 0.03;
+  projectile.height = app.renderer.height * 0.05;
+  projectile.x = app.renderer.width;
+  projectile.y = plane.getSprite().y;
+  stageManager.main.addChild(projectile);
+  projectiles.push(projectile);
 }
 
 function collisionPlane() {
-  for (let y = 0; y < tanksBullets.length; y++) {
-    const b = tanksBullets[y];
+  for (let y = 0; y < projectiles.length; y++) {
+    const b = projectiles[y];
     const aBox = plane.getSprite().getBounds();
     const bBox = b.getBounds();
     if (
@@ -174,46 +172,48 @@ function collisionPlane() {
   }
 }
 
-function updateBullets() {
-  for (let i = 0; i < tanksBullets.length; i++) {
-    tanksBullets[i].position.x -= bulletSpeed;
-    if (tanksBullets[i].position.x < 0) {
-      stageManager.main.removeChild(tanksBullets[i]);
-      tanksBullets.splice(i, 1);
+function updateProjectiles() {
+  for (let i = 0; i < projectiles.length; i++) {
+    projectiles[i].position.x -= projectileSpeed;
+    if (projectiles[i].position.x < 0) {
+      stageManager.main.removeChild(projectiles[i]);
+      projectiles.splice(i, 1);
     }
   }
 }
 
 function updateTanks() {
   for (let i = 0; i < tanks.length; i++) {
-    tanks[i].position.x -= tankSpeed;
-    if (tanks[i].position.x < 0) {
-      stageManager.main.removeChild(tanks[i]);
+    tanks[i].move();
+    if (tanks[i].getX() < 0) {
+      stageManager.main.removeChild(tanks[i].getSprite());
       tanks.splice(i, 1);
     }
   }
 }
 
 function makeEnemy() {
-  const tank = PIXI.Sprite.from("./images/enemy.png");
-  tank.width = app.renderer.width / 10;
-  tank.height = app.renderer.height * 0.11;
+  // const tank = PIXI.Sprite.from("./images/enemy.png");
+  const tank = new Enemy(PIXI.Sprite.from("./images/enemy.png"));
 
-  tank.x = app.renderer.width;
-  tank.y = app.renderer.height * 0.805;
+  tank.getSprite().width = app.renderer.width / 10;
+  tank.getSprite().height = app.renderer.height * 0.11;
 
-  stageManager.main.addChild(tank);
+  tank.getSprite().x = app.renderer.width;
+  tank.getSprite().y = app.renderer.height * 0.805;
+
+  stageManager.main.addChild(tank.getSprite());
   tanks.push(tank);
 }
 
-function collisionTanks(arr1: Array<Sprite>, arr2: Array<Sprite>) {
+function collisionTanks(arr1: Array<Enemy>, arr2: Array<Sprite>) {
   if (arr1.length > 0 && arr2.length > 0) {
     for (let i = 0; i < arr1.length; i++) {
       const a = arr1[i];
       for (let y = 0; y < arr2.length; y++) {
         const b = arr2[y];
 
-        const aBox = a.getBounds();
+        const aBox = a.getSprite().getBounds();
         const bBox = b.getBounds();
         if (
           aBox.x + aBox.width > bBox.x &&
@@ -222,7 +222,7 @@ function collisionTanks(arr1: Array<Sprite>, arr2: Array<Sprite>) {
           aBox.y < bBox.y + bBox.height
         ) {
           plane.hitEnemy();
-          stageManager.main.removeChild(a);
+          stageManager.main.removeChild(a.getSprite());
           arr1.splice(i, 1);
         }
       }
@@ -287,5 +287,5 @@ function mainScreenGame() {
   stageManager.main.addChild(plane.getSprite());
 
   setInterval(makeEnemy, 2000);
-  setInterval(makeEnemyBullets, 1000);
+  setInterval(makeEnemyProjectile, 1000);
 }
