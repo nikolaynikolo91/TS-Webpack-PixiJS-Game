@@ -3,18 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
   "devDependencies": {
-    "@pixi/graphics-extras": "^6.0.4",
+    "@pixi/graphics-extras": "^6.5.10",
     "file-loader": "^6.2.0",
     "image-webpack-loader": "^7.0.1",
-    "pixi.js": "^6.0.4",
-    "source-map-loader": "^1.0.0",
-    "ts-loader": "^9.2.3",
-    "typescript": "^4.3.5",
-    "webpack": "^5.45.1",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2"
+    "pixi.js": "^6.5.10",
+    "source-map-loader": "^1.1.3",
+    "ts-loader": "^9.4.4",
+    "typescript": "^4.9.5",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^3.11.3"
   },
   "scripts": {
     "serve": "webpack serve",
