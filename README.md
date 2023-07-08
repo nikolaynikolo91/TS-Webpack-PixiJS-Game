@@ -19,7 +19,7 @@ npm run build
 ```sh
 npm run serve
 ```
-Dillinger is very easy to install and deploy in a Docker container.
+
 
 By default, the server will expose port 9000.
 
