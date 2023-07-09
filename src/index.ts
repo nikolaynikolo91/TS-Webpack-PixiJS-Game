@@ -134,7 +134,6 @@ function mainScreenGame() {
 
   mainGameTicker.add(gameLoop);
 
-  // add background clouds
   const backgroundTexture = PIXI.Texture.from("./images/background-img.jpg");
   const bgSprite = new PIXI.TilingSprite(
     backgroundTexture,
