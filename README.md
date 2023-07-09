@@ -20,7 +20,6 @@ npm run build
 npm run serve
 ```
 
-
 By default, the server will expose port 9000.
 
 ```sh
